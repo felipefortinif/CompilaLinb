@@ -11,12 +11,14 @@ static void error (const char *msg, int line) {
   exit(EXIT_FAILURE);
 }
 
-void escrevePrologo(unsigned char codigo[], int i){
+int escrevePrologo(unsigned char codigo[], int i){
   codigo[i++] = 0x55;codigo[i++] = 0x48;codigo[i++] = 0x89;codigo[i++] = 0xe5; 
+  return i;
 }
 
-void escreveFim(unsigned char codigo[], int i){
+int escreveFim(unsigned char codigo[], int i){
   codigo[i++] = 0xc9;codigo[i++] = 0xc3;
+  return i;
 }
 
 ///////////////////////////////////////////////////// FUNCAO PRINCIPAL
@@ -27,7 +29,7 @@ funcp CompilaLinB (FILE *f, unsigned char codigo[]) {
   int i = 0;
   
   
-  escrevePrologo(codigo, i);
+  i = escrevePrologo(codigo, i);
 
   while ((c = fgetc(f)) != EOF) {
     switch (c) {
@@ -35,6 +37,7 @@ funcp CompilaLinB (FILE *f, unsigned char codigo[]) {
         char c0;
         if (fscanf(f, "et%c", &c0) != 1)
           error("comando invalido", line);
+        i = escreveFim(codigo, i);
         printf("ret\n");
         break;
       }
@@ -63,6 +66,5 @@ funcp CompilaLinB (FILE *f, unsigned char codigo[]) {
     fscanf(f, " ");
   }
   
-  escreveFim(codigo, i);
   return (funcp)codigo;
 }
