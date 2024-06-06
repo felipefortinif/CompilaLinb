@@ -64,6 +64,5 @@ funcp CompilaLinB (FILE *f, unsigned char codigo[]) {
   }
   
   escreveFim(codigo, i);
-  return codigo;
+  return (funcp)codigo;
 }
-
