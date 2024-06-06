@@ -12,7 +12,9 @@ int main(void){
     exit(1);
   }
   
-  funcp func = CompilaLinB(myfp);
+  unsigned char codigo[1000];
+  funcp func = CompilaLinB(myfp, codigo);
+  
   
   assert(func != NULL);
   assert((*func)() == 1);
