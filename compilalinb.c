@@ -605,13 +605,577 @@ int atribuicao(unsigned char codigo[], int i, char c, int idx0, char var1, int i
       break;
     }
 
-    case '-':{
+    case '-':{// quando a operacao eh uma subtracao
+      switch(var2) {
+        case '$': {// quando o segundo operador eh uma constante
+          unsigned char byte1, byte2, byte3, byte4;
+          byte1 = (idx2 >> 24) & 0xFF;
+          byte2 = (idx2 >> 16) & 0xFF;
+          byte3 = (idx2 >> 8) & 0xFF;
+          byte4 = idx2 & 0xFF;
 
+          switch(c){// pega a variavel que vai receber
+            case 'v':{
+              switch(idx0){
+                case 1:{
+                  codigo[i++] = 0x2d; codigo[i++] = byte4; codigo[i++] = byte3; 
+                  codigo[i++] = byte2; codigo[i++] = byte1; break;
+                }
+                case 2:{
+                  codigo[i++] = 0x81; codigo[i++] = 0xea; codigo[i++] = byte4;  
+                  codigo[i++] = byte3; codigo[i++] = byte2; codigo[i++] = byte1; break;
+                }
+                case 3:{
+                  codigo[i++] = 0x81; codigo[i++] = 0xe9; codigo[i++] = byte4;  
+                  codigo[i++] = byte3; codigo[i++] = byte2; codigo[i++] = byte1; break;
+                }
+                case 4:{
+                  codigo[i++] = 0x41; codigo[i++] = 0x81; codigo[i++] = 0xe8; codigo[i++] = byte4; 
+                  codigo[i++] = byte3; codigo[i++] = byte2; codigo[i++] = byte1; break;              
+                }
+              }
+              break;
+            }
+            case 'p':{
+              switch(idx0){
+                case 1:{
+                  codigo[i++] = 0x81; codigo[i++] = 0xef; codigo[i++] = byte4;  
+                  codigo[i++] = byte3; codigo[i++] = byte2; codigo[i++] = byte1; break;
+                }
+                case 2:{
+                  codigo[i++] = 0x81; codigo[i++] = 0xee; codigo[i++] = byte4;  
+                  codigo[i++] = byte3; codigo[i++] = byte2; codigo[i++] = byte1; break;
+                }
+              }
+              break;
+            }
+          }
+          break;
+        }
+        // quando o segundo operador eh varp
+        case 'p':
+        case 'v':{
+          switch(c){// pega o valor que vai receber
+            case 'v':{// valor que vai receber eh var
+              if (var2 == 'v'){// segundo operador eh var
+                switch(idx0){
+                  case 1:{// valor que vai receber eh v1
+                    if(idx2 == 4){
+                      codigo[i++] = 0x44;
+                    }
+                    codigo[i++] = 0x29;
+
+                    switch(idx2){// pega o segundo operador
+                      case 1:{
+                        codigo[i++] = 0xc0; break;
+                      }
+                      case 2:{
+                        codigo[i++] = 0xd0; break;
+                      }
+                      case 3:{
+                        codigo[i++] = 0xc8; break;
+                      }
+                      case 4:{
+                        codigo[i++] = 0xc0; break;
+                      }
+                    }
+                    break;
+                  }
+                  case 2:{// valor que vai receber eh v2
+                    if(idx2 == 4){
+                      codigo[i++] = 0x44;
+                    }
+                    codigo[i++] = 0x29;
+                    
+                    switch(idx2){// pega o segundo operador
+                      case 1:{
+                        codigo[i++] = 0xc2; break;
+                      }
+                      case 2:{
+                        codigo[i++] = 0xd2; break;
+                      }
+                      case 3:{
+                        codigo[i++] = 0xca; break;
+                      }
+                      case 4:{
+                        codigo[i++] = 0xc2; break;
+                      }
+                    }
+                    break;
+                  }
+                  case 3:{// valor que vai receber eh v3
+                    if(idx2 == 4){
+                      codigo[i++] = 0x44;
+                    }
+                    codigo[i++] = 0x29;
+                    
+                    switch(idx2){// pega o segundo operador
+                      case 1:{
+                        codigo[i++] = 0xc1; break;
+                      }
+                      case 2:{
+                        codigo[i++] = 0xd1; break;
+                      }
+                      case 3:{
+                        codigo[i++] = 0xc9; break;
+                      }
+                      case 4:{
+                        codigo[i++] = 0xc1; break;
+                      }
+                    }
+                    break;
+                  }
+                  case 4:{// valor que vai receber eh v4
+                    if(idx2 == 4){
+                      codigo[i++] = 0x45;
+                    }
+                    else{
+                      codigo[i++] = 0x41;
+                    }
+                    codigo[i++] = 0x29;
+                    
+                    switch(idx2){// pega o segundo operador
+                      case 1:{
+                        codigo[i++] = 0xc0; break;
+                      }
+                      case 2:{
+                        codigo[i++] = 0xd0; break;
+                      }
+                      case 3:{
+                        codigo[i++] = 0xc8; break;
+                      }
+                      case 4:{
+                        codigo[i++] = 0xc0; break;
+                      }
+                    }
+                    break;
+                  }
+                } 
+              }
+              else if(var2 == 'p'){// segundo operador eh param
+                switch(idx0){
+                  case 1:{// valor que vai receber eh v1
+                    codigo[i++] = 0x29;
+                    switch(idx2){// pega o segundo operador
+                      case 1:{
+                        codigo[i++] = 0xf8; break;
+                      }
+                      case 2:{
+                        codigo[i++] = 0xf0; break;
+                      }
+                    }
+                    break;
+                  }
+                  case 2:{// valor que vai receber eh v2
+                    codigo[i++] = 0x29;
+                    switch(idx2){// pega o segundo operador
+                      case 1:{
+                        codigo[i++] = 0xfa; break;
+                      }
+                      case 2:{
+                        codigo[i++] = 0xf2; break;
+                      }
+                    }
+                    break;
+                  }
+                  case 3:{// valor que vai receber eh v3
+                    codigo[i++] = 0x29;
+                    switch(idx2){// pega o segundo operador
+                      case 1:{
+                        codigo[i++] = 0xf9; break;
+                      }
+                      case 2:{
+                        codigo[i++] = 0xf1; break;
+                      }
+                    }
+                    break;
+                  }
+                  case 4:{// valor que vai receber eh v4
+                    codigo[i++] = 0x41; codigo[i++] = 0x29;
+                    switch(idx2){// pega o segundo operador
+                      case 1:{
+                        codigo[i++] = 0xf8; break;
+                      }
+                      case 2:{
+                        codigo[i++] = 0xf0; break;
+                      }
+                    }
+                    break;
+                  }
+                } 
+              }
+              break;
+            }
+            case 'p':{// valor que vai receber eh param
+              if (var2 == 'v'){// segundo operador eh var
+                switch(idx0){
+                  case 1:{// valor que vai receber eh p1
+                    if(idx2 == 4){
+                      codigo[i++] = 0x44;
+                    }
+                    codigo[i++] = 0x29;
+
+                    switch(idx2){// pega o segundo operador
+                      case 1:{
+                        codigo[i++] = 0xc7; break;
+                      }
+                      case 2:{
+                        codigo[i++] = 0xd7; break;
+                      }
+                      case 3:{
+                        codigo[i++] = 0xcf; break;
+                      }
+                      case 4:{
+                        codigo[i++] = 0xc7; break;
+                      }
+                    }
+                    break;
+                  }
+                  case 2:{// valor que vai receber eh p2
+                    if(idx2 == 4){
+                      codigo[i++] = 0x44;
+                    }
+                    codigo[i++] = 0x29;
+                    
+                    switch(idx2){// pega o segundo operador
+                      case 1:{
+                        codigo[i++] = 0xc6; break;
+                      }
+                      case 2:{
+                        codigo[i++] = 0xd6; break;
+                      }
+                      case 3:{
+                        codigo[i++] = 0xce; break;
+                      }
+                      case 4:{
+                        codigo[i++] = 0xc6; break;
+                      }
+                    }
+                    break;
+                  }
+                } 
+              }
+              else if(var2 == 'p'){// segundo operador eh param
+                switch(idx0){
+                  case 1:{// valor que vai receber eh p1
+                    codigo[i++] = 0x29;
+                    switch(idx2){// pega o segundo operador
+                      case 1:{
+                        codigo[i++] = 0xff; break;
+                      }
+                      case 2:{
+                        codigo[i++] = 0xf7; break;
+                      }
+                    }
+                    break;
+                  }
+                  case 2:{// valor que vai receber eh p2
+                    codigo[i++] = 0x29;
+                    switch(idx2){// pega o segundo operador
+                      case 1:{
+                        codigo[i++] = 0xfe; break;
+                      }
+                      case 2:{
+                        codigo[i++] = 0xf6; break;
+                      }
+                    }
+                    break;
+                  }
+                } 
+              }
+              break;
+            }
+          }
+          break;
+        }
+      }
       break;
     }
     
-    case '*':{
+    case '*':{// quando a operacao eh uma multiplicacao
+      switch(var2) {
+        case '$': {// quando o segundo operador eh uma constante
+          unsigned char byte1, byte2, byte3, byte4;
+          byte1 = (idx2 >> 24) & 0xFF;
+          byte2 = (idx2 >> 16) & 0xFF;
+          byte3 = (idx2 >> 8) & 0xFF;
+          byte4 = idx2 & 0xFF;
 
+          switch(c){// pega a variavel que vai receber
+            case 'v':{
+              switch(idx0){
+                case 1:{
+                  codigo[i++] = 0x69; codigo[i++] = 0xc0; codigo[i++] = byte4;
+                  codigo[i++] = byte3; codigo[i++] = byte2; codigo[i++] = byte1; break;
+                }
+                case 2:{
+                  codigo[i++] = 0x69; codigo[i++] = 0xd2; codigo[i++] = byte4;  
+                  codigo[i++] = byte3; codigo[i++] = byte2; codigo[i++] = byte1; break;
+                }
+                case 3:{
+                  codigo[i++] = 0x69; codigo[i++] = 0xc9; codigo[i++] = byte4;  
+                  codigo[i++] = byte3; codigo[i++] = byte2; codigo[i++] = byte1; break;
+                }
+                case 4:{
+                  codigo[i++] = 0x45; codigo[i++] = 0x69; codigo[i++] = 0xc0; codigo[i++] = byte4; 
+                  codigo[i++] = byte3; codigo[i++] = byte2; codigo[i++] = byte1; break;              
+                }
+              }
+              break;
+            }
+            case 'p':{
+              switch(idx0){
+                case 1:{
+                  codigo[i++] = 0x69; codigo[i++] = 0xff; codigo[i++] = byte4;  
+                  codigo[i++] = byte3; codigo[i++] = byte2; codigo[i++] = byte1; break;
+                }
+                case 2:{
+                  codigo[i++] = 0x69; codigo[i++] = 0xf6; codigo[i++] = byte4;  
+                  codigo[i++] = byte3; codigo[i++] = byte2; codigo[i++] = byte1; break;
+                }
+              }
+              break;
+            }
+          }
+          break;
+        }
+        // quando o segundo operador eh varp
+        case 'p':
+        case 'v':{
+          switch(c){// pega o valor que vai receber
+            case 'v':{// valor que vai receber eh var
+              if (var2 == 'v'){// segundo operador eh var
+                switch(idx0){
+                  case 1:{// valor que vai receber eh v1
+                    if(idx2 == 4){
+                      codigo[i++] = 0x41;
+                    }
+                    codigo[i++] = 0x0f; codigo[i++] = 0xaf;
+
+                    switch(idx2){// pega o segundo operador
+                      case 1:{
+                        codigo[i++] = 0xc0; break;
+                      }
+                      case 2:{
+                        codigo[i++] = 0xc2; break;
+                      }
+                      case 3:{
+                        codigo[i++] = 0xc1; break;
+                      }
+                      case 4:{
+                        codigo[i++] = 0xc0; break;
+                      }
+                    }
+                    break;
+                  }
+                  case 2:{// valor que vai receber eh v2
+                    if(idx2 == 4){
+                      codigo[i++] = 0x41;
+                    }
+                    codigo[i++] = 0x0f; codigo[i++] = 0xaf;
+                    
+                    switch(idx2){// pega o segundo operador
+                      case 1:{
+                        codigo[i++] = 0xd0; break;
+                      }
+                      case 2:{
+                        codigo[i++] = 0xd2; break;
+                      }
+                      case 3:{
+                        codigo[i++] = 0xd1; break;
+                      }
+                      case 4:{
+                        codigo[i++] = 0xd0; break;
+                      }
+                    }
+                    break;
+                  }
+                  case 3:{// valor que vai receber eh v3
+                    if(idx2 == 4){
+                      codigo[i++] = 0x41;
+                    }
+                    codigo[i++] = 0x0f; codigo[i++] = 0xaf;
+                    
+                    switch(idx2){// pega o segundo operador
+                      case 1:{
+                        codigo[i++] = 0xc8; break;
+                      }
+                      case 2:{
+                        codigo[i++] = 0xca; break;
+                      }
+                      case 3:{
+                        codigo[i++] = 0xc9; break;
+                      }
+                      case 4:{
+                        codigo[i++] = 0xc8; break;
+                      }
+                    }
+                    break;
+                  }
+                  case 4:{// valor que vai receber eh v4
+                    if(idx2 == 4){
+                      codigo[i++] = 0x45;
+                    }
+                    else{
+                      codigo[i++] = 0x44;
+                    }
+                    codigo[i++] = 0x0f; codigo[i++] = 0xaf;
+                    
+                    switch(idx2){// pega o segundo operador
+                      case 1:{
+                        codigo[i++] = 0xc0; break;
+                      }
+                      case 2:{
+                        codigo[i++] = 0xc2; break;
+                      }
+                      case 3:{
+                        codigo[i++] = 0xc1; break;
+                      }
+                      case 4:{
+                        codigo[i++] = 0xc0; break;
+                      }
+                    }
+                    break;
+                  }
+                } 
+              }
+              else if(var2 == 'p'){// segundo operador eh param
+                switch(idx0){
+                  case 1:{// valor que vai receber eh v1
+                    codigo[i++] = 0x0f; codigo[i++] = 0xaf;
+                    switch(idx2){// pega o segundo operador
+                      case 1:{
+                        codigo[i++] = 0xc7; break;
+                      }
+                      case 2:{
+                        codigo[i++] = 0xc6; break;
+                      }
+                    }
+                    break;
+                  }
+                  case 2:{// valor que vai receber eh v2
+                    codigo[i++] = 0x0f; codigo[i++] = 0xaf;
+                    switch(idx2){// pega o segundo operador
+                      case 1:{
+                        codigo[i++] = 0xd7; break;
+                      }
+                      case 2:{
+                        codigo[i++] = 0xd6; break;
+                      }
+                    }
+                    break;
+                  }
+                  case 3:{// valor que vai receber eh v3
+                    codigo[i++] = 0x0f; codigo[i++] = 0xaf;
+                    switch(idx2){// pega o segundo operador
+                      case 1:{
+                        codigo[i++] = 0xcf; break;
+                      }
+                      case 2:{
+                        codigo[i++] = 0xce; break;
+                      }
+                    }
+                    break;
+                  }
+                  case 4:{// valor que vai receber eh v4
+                    codigo[i++] = 0x44; codigo[i++] = 0x0f; codigo[i++] = 0xaf;
+                    switch(idx2){// pega o segundo operador
+                      case 1:{
+                        codigo[i++] = 0xc7; break;
+                      }
+                      case 2:{
+                        codigo[i++] = 0xc6; break;
+                      }
+                    }
+                    break;
+                  }
+                } 
+              }
+              break;
+            }
+            case 'p':{// valor que vai receber eh param
+              if (var2 == 'v'){// segundo operador eh var
+                switch(idx0){
+                  case 1:{// valor que vai receber eh p1
+                    if(idx2 == 4){
+                      codigo[i++] = 0x41;
+                    }
+                    codigo[i++] = 0x0f; codigo[i++] = 0xaf;
+
+                    switch(idx2){// pega o segundo operador
+                      case 1:{
+                        codigo[i++] = 0xf8; break;
+                      }
+                      case 2:{
+                        codigo[i++] = 0xfa; break;
+                      }
+                      case 3:{
+                        codigo[i++] = 0xf9; break;
+                      }
+                      case 4:{
+                        codigo[i++] = 0xf8; break;
+                      }
+                    }
+                    break;
+                  }
+                  case 2:{// valor que vai receber eh p2
+                    if(idx2 == 4){
+                      codigo[i++] = 0x41;
+                    }
+                    codigo[i++] = 0x0f; codigo[i++] = 0xaf;
+                    
+                    switch(idx2){// pega o segundo operador
+                      case 1:{
+                        codigo[i++] = 0xf0; break;
+                      }
+                      case 2:{
+                        codigo[i++] = 0xf2; break;
+                      }
+                      case 3:{
+                        codigo[i++] = 0xf1; break;
+                      }
+                      case 4:{
+                        codigo[i++] = 0xf0; break;
+                      }
+                    }
+                    break;
+                  }
+                } 
+              }
+              else if(var2 == 'p'){// segundo operador eh param
+                switch(idx0){
+                  case 1:{// valor que vai receber eh p1
+                    codigo[i++] = 0x0f; codigo[i++] = 0xaf;
+                    switch(idx2){// pega o segundo operador
+                      case 1:{
+                        codigo[i++] = 0xff; break;
+                      }
+                      case 2:{
+                        codigo[i++] = 0xfe; break;
+                      }
+                    }
+                    break;
+                  }
+                  case 2:{// valor que vai receber eh p2
+                    codigo[i++] = 0x0f; codigo[i++] = 0xaf;
+                    switch(idx2){// pega o segundo operador
+                      case 1:{
+                        codigo[i++] = 0xf7; break;
+                      }
+                      case 2:{
+                        codigo[i++] = 0xf6; break;
+                      }
+                    }
+                    break;
+                  }
+                } 
+              }
+              break;
+            }
+          }
+          break;
+        }
+      }
       break;
     }
 
