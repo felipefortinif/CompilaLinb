@@ -1183,22 +1183,100 @@ int atribuicao(unsigned char codigo[], int i, char c, int idx0, char var1, int i
   return i;
 }
 
+int desvio(unsigned char codigo[], int i, char var0, int idx0){
+  //cmp $0 %...
+  switch(var0){
+    case 'v':{
+      if(idx0 == 4){
+        codigo[i++] = 0x41;
+      }
+      codigo[i++] = 0x83;
+      switch(idx0){
+        case 1:{
+          codigo[i++] = 0xf8; codigo[i++] = 0x00;
+          break;
+        }
+        case 2:{
+          codigo[i++] = 0xfa; codigo[i++] = 0x00;
+          break;
+        }
+        case 3:{
+          codigo[i++] = 0xf9; codigo[i++] = 0x00;
+          break;
+        }
+        case 4:{
+          codigo[i++] = 0xf8; codigo[i++] = 0x00;
+          break;
+        }
+      }
+      break;
+    }
+    case 'p':{
+      codigo[i++] = 0x83;
+      switch(idx0){
+        case 1:{
+          codigo[i++] = 0xff; codigo[i++] = 0x00;
+          break;
+        }
+        case 2:{
+          codigo[i++] = 0xfe; codigo[i++] = 0x00;
+          break;
+        }
+      }
+      break;
+    }
+  }
+
+  //jne <linha>
+  codigo[i++] = 0x0f; codigo[i++] = 0x85; codigo[i++] = 0x00; codigo[i++] = 0x00;
+  codigo[i++] = 0x00; codigo[i++] = 0x00;
+  
+  return i;
+}
+
+void escreve_offsets(unsigned char codigo[], int endereco_linhas[], int jmps[], int bytes){
+  int jmp = 0;
+  for(int k = 0; k <= bytes; k++){
+    if(codigo[k] == 0x0f && codigo[k+1] == 0x85){
+      
+      int destino = jmps[jmp];
+      jmp++;
+
+      int offset = endereco_linhas[destino];
+
+      unsigned char byte1, byte2, byte3, byte4;
+      byte1 = (offset >> 24) & 0xFF;
+      byte2 = (offset >> 16) & 0xFF;
+      byte3 = (offset >> 8) & 0xFF;
+      byte4 = offset & 0xFF;
+
+      codigo[k+2] = byte4; codigo[k+3] = byte3; codigo[k+4] = byte2; codigo[k+5] = byte1;
+
+    }
+  }
+
+}
+
 ///////////////////////////////////////////////////// FUNCAO PRINCIPAL
 
 funcp CompilaLinB (FILE *f, unsigned char codigo[]) {
   int line = 1;
   int  c;
   int i = 0;
-  
+  int endereco_linhas[50];
+  int jmps[50];
+  int j = 0;
   
   i = escrevePrologo(codigo, i);
 
   while ((c = fgetc(f)) != EOF) {
+    endereco_linhas[line] = i;
     switch (c) {
       case 'r': { /* retorno */
         char c0;
         if (fscanf(f, "et%c", &c0) != 1)
-          error("comando invalido", line);
+          error("comando invalido1", line);
+
         i = escreveFim(codigo, i);
         printf("ret\n");
         break;
@@ -1208,8 +1286,9 @@ funcp CompilaLinB (FILE *f, unsigned char codigo[]) {
         int idx0, idx1, idx2;
         char var0 = c, var1, var2, op;
         if (fscanf(f, "%d <= %c%d %c %c%d", &idx0, &var1, &idx1, &op, &var2, &idx2) != 6)
-            error("comando invalido", line);
-          printf("%c%d = %c%d %c %c%d\n", var0, idx0, var1, idx1, op, var2, idx2);
+            error("comando invalido2", line);
+          printf("%c%d <= %c%d %c %c%d\n", var0, idx0, var1, idx1, op, var2, idx2);
+
         i = atribuicao(codigo, i, c, idx0, var1, idx1, op, var2, idx2);
         break;
       }
@@ -1217,8 +1296,13 @@ funcp CompilaLinB (FILE *f, unsigned char codigo[]) {
         char var0;
         int idx0, num;
         if (fscanf(f, "f %c%d %d", &var0, &idx0, &num) != 3)
-            error("comando invalido", line);
-          printf("if %c%d %d\n", var0, idx0, num);
+            error("comando invalido3", line);
+
+        i = desvio(codigo, i, var0, idx0);
+        jmps[j] = num;
+        j++;
+
+        printf("if %c%d %d\n", var0, idx0, num);
         break;
       }
       default: error("comando desconhecido", line);
@@ -1227,5 +1311,6 @@ funcp CompilaLinB (FILE *f, unsigned char codigo[]) {
     fscanf(f, " ");
   }
   
+  escreve_offsets(codigo, endereco_linhas, jmps, i);
   return (funcp)codigo;
 }
