@@ -1236,13 +1236,13 @@ int desvio(unsigned char codigo[], int i, char var0, int idx0){
 
 void escreve_offsets(unsigned char codigo[], int endereco_linhas[], int jmps[], int bytes){
   int jmp = 0;
-  for(int k = 0; k <= bytes; k++){
+  for(int k = 0; k < bytes; k++){
     if(codigo[k] == 0x0f && codigo[k+1] == 0x85){
       
       int destino = jmps[jmp];
       jmp++;
 
-      int offset = endereco_linhas[destino];
+      int offset = endereco_linhas[destino] - (k + 6);
 
       unsigned char byte1, byte2, byte3, byte4;
       byte1 = (offset >> 24) & 0xFF;
@@ -1253,6 +1253,7 @@ void escreve_offsets(unsigned char codigo[], int endereco_linhas[], int jmps[], 
       codigo[k+2] = byte4; codigo[k+3] = byte3; codigo[k+4] = byte2; codigo[k+5] = byte1;
 
     }
+    
   }
 
 }
