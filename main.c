@@ -13,7 +13,7 @@ int main(void){
   
   unsigned char codigo[1000];
   
-  funcp func = CompilaLinB(myfp, codigo);
+  funcp func = compilaLinB(myfp, codigo);
 
   printf("\nCodigo:");
   for (int i = 0; i < 35; i++){
