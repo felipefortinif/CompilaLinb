@@ -1,3 +1,3 @@
 #include <stdio.h>
 typedef int (*funcp) ();
-funcp CompilaLinB (FILE *f, unsigned char codigo[]);
+funcp compilaLinB (FILE *f, unsigned char codigo[]);
